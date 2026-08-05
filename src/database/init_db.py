@@ -45,11 +45,14 @@ def init_db():
             db.commit()
             print(f"Inserted {len(emp_df)} employees.")
 
+            # Precargar todos los IDs válidos para evitar N+1 queries
+            valid_emp_ids = {emp.emp_id for emp in db.query(Employee.emp_id).all()}
+
             # 2. Engagement Surveys
             eng_df = pd.read_csv(f"{data_dir}/employee_engagement_survey_data.csv")
             for _, row in eng_df.iterrows():
                 # verify employee exists
-                if db.query(Employee).filter_by(emp_id=row['Employee ID']).first():
+                if row['Employee ID'] in valid_emp_ids:
                     surv = EngagementSurvey(
                         employee_id=row['Employee ID'],
                         survey_date=row['Survey Date'],
@@ -65,7 +68,7 @@ def init_db():
             train_df = pd.read_csv(f"{data_dir}/training_and_development_data.csv")
             for _, row in train_df.iterrows():
                 # verify employee exists
-                if db.query(Employee).filter_by(emp_id=row['Employee ID']).first():
+                if row['Employee ID'] in valid_emp_ids:
                     train = HRTraining(
                         employee_id=row['Employee ID'],
                         training_date=row['Training Date'],

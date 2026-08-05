@@ -1,0 +1,41 @@
+services:
+  lms_db:
+    image: postgres:15-alpine
+    container_name: employee_lms_db
+    environment:
+      POSTGRES_USER: jcampillay
+      POSTGRES_PASSWORD: BTC.100K.jc
+      POSTGRES_DB: lms
+    ports:
+      - "5443:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U jcampillay -d lms" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - employee_lms_postgres_data:/var/lib/postgresql/data
+
+  lms_app:
+    build: .
+    container_name: employee_lms_app
+    ports:
+      - "8050:8080"
+    volumes:
+      - .:/app # <--- 🚀 ESTO ES CLAVE: Sincroniza tus archivos locales con el contenedor
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://jcampillay:BTC.100K.jc@lms_db:5432/lms
+      DB_USER: jcampillay
+      DB_PASSWORD: BTC.100K.jc
+      DB_HOST: lms_db
+      DB_PORT: 5432
+      DB_NAME: lms
+      ENVIRONMENT: development
+    depends_on:
+      lms_db:
+        condition: service_healthy
+
+volumes:
+  employee_lms_postgres_data:

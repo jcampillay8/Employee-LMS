@@ -20,9 +20,9 @@ class Settings(BaseSettings):
     ENVIRONMENT: str 
     PROJECT_NAME: str
 
-# Soporta una lista de strings separados por coma
-    ALLOWED_ORIGINS: str
-    WEBSITE_URL: str
+    # Soporta una lista de strings separados por coma
+    ALLOWED_ORIGINS: str = "*"
+    WEBSITE_URL: str = ""
 
     # Base de Datos (Estas son OBLIGATORIAS en Neon/Railway)
     # Al no ponerles un valor por defecto (como = None), 
